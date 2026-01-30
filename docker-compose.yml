@@ -7,8 +7,6 @@ services:
     command: ["python" ,"manage.py" ,"runserver","0.0.0.0:8000"]
     ports:
       - "8000:8000"
-    depends_on: 
-      - database
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
