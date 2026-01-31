@@ -34,6 +34,11 @@ class LoanCheckInputSerializer(serializers.Serializer):
     interest_rate = serializers.DecimalField(required=True)
     tenure = serializers.IntegerField(required = True)
     
+    
+    def validate_customer_id(self,value):
+        if not CustomerData.objects.filter(id=value).all()
+            raise serializers.ValidationError("no such customer found")
+        return value
     def validate_loan_amount(self, value):
         if value <= 0:
             raise serializers.ValidationError("Loan amount must be greater than 0")
@@ -54,6 +59,6 @@ class LoanCheckOutputSerializer(serializers.Serializer):
     customer_id = serializers.IntegerField()
     approval = serializers.BooleanField()
     interest_rate = serializers.FloatField(allow_null=True)
-    corrected_interested_rate = serializers.FloatField(allow_null=True)
+    corrected_interest_rate = serializers.FloatField(allow_null=True)
     tenure = serializers.IntegerField()
     monthly_installment = serializers.FloatField(allow_null=True)
