@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import status
+from credit.models import CustomerData,LoanData
 from rest_framework.response import Response
 from credit.services.loan_check import loan_checker
-from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer
+from datetime import date
+from dateutil.relativedelta import relativedelta
+from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer,CreateLoanInputSerializer,CreateLoanOutputSerializer
 # Create your views here.
 
 
@@ -30,3 +33,27 @@ class EligibiltyCheck(APIView):
         result = loan_checker(customer_id,loan_amount,interest_rate,tenure)
         fin_result = LoanCheckOutputSerializer(result)
         return Response(fin_result.data,status=status.HTTP_200_OK)
+    
+class CreateLoan(APIView):
+    def post(self, request):
+        serializer = CreateLoanInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+
+        result = loan_checker(**data)
+
+        if not result["approval"]:
+            return Response(
+                CreateLoanOutputSerializer({"loan_id": None,"customer_id": data["customer_id"],"loan_approved": False,"message": "Loan not approved based on eligibility criteria","monthly_installment": None,}).data,
+                status=status.HTTP_200_OK,
+            )
+        customer = CustomerData.objects.get(id=data["customer_id"])
+        loan = LoanData.objects.create(customer=customer,loan_amount=data["loan_amount"],tenure=data["tenure"],interest_rate=result["corrected_interest_rate"],monthly_repayment=result["monthly_installment"],EMIs_paid_on_time=0,start_date=date.today(),end_date=date.today() + relativedelta(months=data["tenure"]),
+        )
+        customer.current_debt += data["loan_amount"]
+        customer.save(update_fields=["current_debt"])
+        return Response(
+            CreateLoanOutputSerializer({"loan_id": loan.id,"customer_id": customer.id,"loan_approved": True,"message": "Loan approved","monthly_installment": result["monthly_installment"],}).data,
+            status=status.HTTP_201_CREATED,
+        )
