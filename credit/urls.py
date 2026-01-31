@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterCustomer,EligibiltyCheck
+from .views import RegisterCustomer,EligibiltyCheck,CreateLoan
 
 urlpatterns = [
     path("register/", RegisterCustomer.as_view(), name="register"),
