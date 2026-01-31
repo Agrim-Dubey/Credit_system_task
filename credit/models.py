@@ -7,7 +7,7 @@ class CustomerData(models.Model):
     customer_id = models.IntegerField(unique=True)
     first_name = models.CharField(max_length =255)
     last_name = models.CharField(max_length =255)
-    age = models.IntegerField(null= False, max_digits = 3)
+    age = models.IntegerField(null= False)
     phone_number = models.CharField(unique=True,max_length =15)
     monthly_salary = models.IntegerField(null=False)
     approved_limit = models.IntegerField(null=False)
