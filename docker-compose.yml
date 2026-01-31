@@ -4,20 +4,16 @@ version: "3.8"
 services:
   web:
     build: .
-    command: ["python" ,"manage.py" ,"runserver","0.0.0.0:8000"]
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     ports:
       - "8000:8000"
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+    env_file:
+      - .env
+
   redis:
     image: redis:7-alpine
     container_name: redis
     restart: unless-stopped
-
 
   worker:
     build: .
@@ -25,23 +21,18 @@ services:
     depends_on:
       - redis
       - database
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+    env_file:
+      - .env
 
   database:
     image: postgres:15-alpine
     container_name: employee_data
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:
+
