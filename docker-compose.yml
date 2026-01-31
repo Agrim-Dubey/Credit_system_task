@@ -13,6 +13,25 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+
+
+  worker:
+    build: .
+    command: celery -A django_task worker -l info
+    depends_on:
+      - redis
+      - database
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+
   database:
     image: postgres:15-alpine
     container_name: employee_data
