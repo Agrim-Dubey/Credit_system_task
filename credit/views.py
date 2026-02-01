@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from credit.services.loan_check import loan_checker
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer,CreateLoanInputSerializer,CreateLoanOutputSerializer,DetailSerializer
+from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer,CreateLoanInputSerializer,CreateLoanOutputSerializer,DetailSerializer,ViewLoanSerializer
 # Create your views here.
 
 
@@ -70,7 +70,25 @@ class ViewLoan(APIView):
 
         
 
-    
+class ViewLoanForCustomer(APIView):
+    def get(self, request, customer_id):
+        customer = CustomerData.objects.filter(id=customer_id).first()
+        if not customer:
+            return Response(
+                {"detail": "Customer not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        loans = customer.loans.all()
+        serializer = ViewLoanSerializer(loans, many=True)
+
+        return Response(
+            {
+                "customer_id": customer_id,
+                "loans": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
         
         
         

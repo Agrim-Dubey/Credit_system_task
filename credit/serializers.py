@@ -102,3 +102,14 @@ class DetailSerializer(serializers.Serializer):
     fields = ["id","first_name","last_name","phone_number","age"]
     
     
+class ViewLoanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoanData
+        fields = [
+            "loan_id",
+            "loan_amount",
+            "interest_rate",
+            "monthly_repayment",
+            "tenure",
+        ]
+    
