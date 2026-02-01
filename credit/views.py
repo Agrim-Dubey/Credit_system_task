@@ -6,11 +6,14 @@ from rest_framework.response import Response
 from credit.services.loan_check import loan_checker
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from rest_framework.throttling import ScopedRateThrottle
 from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer,CreateLoanInputSerializer,CreateLoanOutputSerializer,DetailSerializer,ViewLoanSerializer
 # Create your views here.
 
 
 class RegisterCustomer(APIView):
+    throttle_classes =[ScopedRateThrottle]
+    throttle_scope = "register"
     def post(self,request):
         serializer = CustomerRegisterInputSerializer(data=request.data)
         if not serializer.is_valid():
@@ -21,6 +24,8 @@ class RegisterCustomer(APIView):
         return Response(response_serializer.data,staus=status.HTTP_201_CREATED)
     
 class EligibiltyCheck(APIView):
+    throttle_classes =[ScopedRateThrottle]
+    throttle_scope = "check_eligibility"
     def post(self,request):
         serializer = LoanCheckInputSerializer(data=request.data)
         if not serializer.is_valid():
@@ -35,6 +40,8 @@ class EligibiltyCheck(APIView):
         return Response(fin_result.data,status=status.HTTP_200_OK)
     
 class CreateLoan(APIView):
+    throttle_classes =[ScopedRateThrottle]
+    throttle_scope = "create_loan"
     def post(self, request):
         serializer = CreateLoanInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -60,6 +67,8 @@ class CreateLoan(APIView):
 
 
 class ViewLoan(APIView):
+    throttle_classes =[ScopedRateThrottle]
+    throttle_scope = "view_loan"
     def get(self, request, loan_id):
         loan = LoanData.objects.filter(loan_id=loan_id).select_related("customer").first()
         if not loan:
