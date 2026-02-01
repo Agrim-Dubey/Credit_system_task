@@ -20,7 +20,7 @@ class LoanData(models.Model):
         on_delete=models.CASCADE,
         related_name="loans"
     )
-    loan_id = models.IntegerField()
+    loan_id = models.IntegerField(unique=True)
     loan_amount = models.IntegerField()
     tenure = models.IntegerField()
     interest_rate = models.DecimalField(max_digits=4, decimal_places=2)

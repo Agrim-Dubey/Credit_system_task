@@ -75,9 +75,14 @@ def loan_checker(customer_id, loan_amount, interest_rate, tenure):
     else:
         approval = False
 
-    monthly_installment = (
-        loan_amount / tenure if tenure > 0 else 0
-    )
+    if tenure > 0:
+        monthly_interest_rate = float(corrected_interest_rate) / (12 * 100)
+        if monthly_interest_rate > 0:
+            monthly_installment = loan_amount * monthly_interest_rate * ((1 + monthly_interest_rate) ** tenure) / (((1 + monthly_interest_rate) ** tenure) - 1)
+        else:
+            monthly_installment = loan_amount / tenure
+    else:
+        monthly_installment = 0
 
     return {
         "customer_id": customer_id,

@@ -21,7 +21,7 @@ class RegisterCustomer(APIView):
         
         customer  =serializer.save()
         response_serializer = CustomerRegisterOutputSerializer(customer)
-        return Response(response_serializer.data,staus=status.HTTP_201_CREATED)
+        return Response(response_serializer.data,status=status.HTTP_201_CREATED)
     
 class EligibiltyCheck(APIView):
     throttle_classes =[ScopedRateThrottle]
@@ -74,12 +74,14 @@ class ViewLoan(APIView):
         if not loan:
             return Response(
                 {"detail": "No loan with this loan id found"},status=status.HTTP_404_NOT_FOUND,)
-        customer_data = CustomerData(loan.customer).data
+        customer_data = DetailSerializer(loan.customer).data
         return Response({"loan_id": loan.loan_id,"customer": customer_data,"loan_amount": loan.loan_amount,"interest_rate": loan.interest_rate,"monthly_installment": loan.monthly_repayment,"tenure": loan.tenure,},status=status.HTTP_200_OK,)
 
         
 
 class ViewLoanForCustomer(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "view_loan"
     def get(self, request, customer_id):
         customer = CustomerData.objects.filter(id=customer_id).first()
         if not customer:

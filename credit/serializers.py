@@ -32,7 +32,7 @@ class CustomerRegisterOutputSerializer(serializers.ModelSerializer):
 class LoanCheckInputSerializer(serializers.Serializer):
     customer_id=serializers.IntegerField(required = True)
     loan_amount = serializers.IntegerField(required = True)
-    interest_rate = serializers.DecimalField(required=True)
+    interest_rate = serializers.DecimalField(required=True, max_digits=5, decimal_places=2)
     tenure = serializers.IntegerField(required = True)
     
     
@@ -97,9 +97,10 @@ class CreateLoanOutputSerializer(serializers.Serializer):
     message = serializers.CharField()
     monthly_installment = serializers.FloatField(allow_null=True)
     
-class DetailSerializer(serializers.Serializer):
-    model =     CustomerData
-    fields = ["id","first_name","last_name","phone_number","age"]
+class DetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =     CustomerData
+        fields = ["id","first_name","last_name","phone_number","age"]
     
     
 class ViewLoanSerializer(serializers.ModelSerializer):
