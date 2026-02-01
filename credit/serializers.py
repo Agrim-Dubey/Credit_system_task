@@ -96,3 +96,9 @@ class CreateLoanOutputSerializer(serializers.Serializer):
     loan_approved = serializers.BooleanField()
     message = serializers.CharField()
     monthly_installment = serializers.FloatField(allow_null=True)
+    
+class DetailSerializer(serializers.Serializer):
+    model =     CustomerData
+    fields = ["id","first_name","last_name","phone_number","age"]
+    
+    

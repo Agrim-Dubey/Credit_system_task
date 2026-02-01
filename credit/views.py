@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from credit.services.loan_check import loan_checker
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer,CreateLoanInputSerializer,CreateLoanOutputSerializer
+from .serializers import CustomerRegisterInputSerializer,CustomerRegisterOutputSerializer,LoanCheckInputSerializer,LoanCheckOutputSerializer,CreateLoanInputSerializer,CreateLoanOutputSerializer,DetailSerializer
 # Create your views here.
 
 
@@ -57,3 +57,22 @@ class CreateLoan(APIView):
             CreateLoanOutputSerializer({"loan_id": loan.id,"customer_id": customer.id,"loan_approved": True,"message": "Loan approved","monthly_installment": result["monthly_installment"],}).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class ViewLoan(APIView):
+    def get(self, request, loan_id):
+        loan = LoanData.objects.filter(loan_id=loan_id).select_related("customer").first()
+        if not loan:
+            return Response(
+                {"detail": "No loan with this loan id found"},status=status.HTTP_404_NOT_FOUND,)
+        customer_data = CustomerData(loan.customer).data
+        return Response({"loan_id": loan.loan_id,"customer": customer_data,"loan_amount": loan.loan_amount,"interest_rate": loan.interest_rate,"monthly_installment": loan.monthly_repayment,"tenure": loan.tenure,},status=status.HTTP_200_OK,)
+
+        
+
+    
+        
+        
+        
+        
+        
